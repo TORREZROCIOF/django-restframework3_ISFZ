@@ -1,12 +1,12 @@
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
-
+from e_commerce.models import Comic
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.decorators import action
-
+from e_commerce.api.serializers import *
 # Librería para manejar filtrado:
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -262,3 +262,41 @@ class FilteringUserViewSet(viewsets.GenericViewSet):
             ).data,
             status=status.HTTP_200_OK
         )
+        
+class ComicViewSet(viewsets.GenericViewSet):
+    queryset = Comic.objects.all()
+    serializer_class = ComicSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_serializer_context(self):
+        return {'request': self.request, 'view': self}
+
+    def list(self, request):
+        comics = self.get_queryset()
+        serializer = self.get_serializer(comics, many=True, context=self.get_serializer_context())
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        comic = get_object_or_404(self.get_queryset(), pk=pk)
+        serializer = self.get_serializer(comic, context=self.get_serializer_context())
+        return Response(serializer.data)
+
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data, context=self.get_serializer_context())
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request, pk=None):
+        comic = get_object_or_404(self.get_queryset(), pk=pk)
+        serializer = self.get_serializer(comic, data=request.data, context=self.get_serializer_context())
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, pk=None):
+        comic = get_object_or_404(self.get_queryset(), pk=pk)
+        comic.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

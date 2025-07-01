@@ -20,10 +20,14 @@ class ComicSerializer(serializers.ModelSerializer):
         model = Comic
         fields = ('marvel_id','title', 'description', 'price', 'stock_qty', 'picture')
         # fields = ('marvel_id', 'title', 'algo')
-
-    # def get_new_field(self, obj):
-    #     return {'hola':10}
-
+    #Rocio
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        request = self.context.get('request')
+        view = self.context.get('view')
+        if request and request.method == 'GET' and getattr(view, 'action', None) == 'list':
+            rep.pop('description', None)
+        return rep
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

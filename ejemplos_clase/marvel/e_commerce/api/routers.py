@@ -1,6 +1,5 @@
 # Importamos DefaultRouter
 from rest_framework.routers import DefaultRouter
-
 # Tal cual hacíamos con APIView, importamos los
 # Viewsets necesarios, ya que no deja de ser una View.
 from .viewsets import (
@@ -40,4 +39,5 @@ router.register(
     FilteringUserViewSet,
     basename='genericviewset/users'
 )
+
 urlpatterns = router.urls

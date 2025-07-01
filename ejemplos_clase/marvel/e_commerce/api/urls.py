@@ -4,6 +4,7 @@ from e_commerce.api.marvel_api_views import *
 # Importamos las API_VIEWS:
 from e_commerce.api.api_views import *
 
+from e_commerce.api.wishlist_views import CartAndFavoritesView
 
 urlpatterns = [
     # User APIs:
@@ -28,4 +29,9 @@ urlpatterns = [
 
     # User API Viewsets:
     path('api/', include('e_commerce.api.routers')),
+    
+    # Viewset solo lectura de comics
+    path('api/', include('e_commerce.api.comic_routers')),
+    
+    path('wishlist/<int:pk>/cart-favs/', CartAndFavoritesView.as_view(), name='wishlist-cart-favs'),
 ]
